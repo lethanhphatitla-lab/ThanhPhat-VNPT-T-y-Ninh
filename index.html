@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VNPT VinaPhone - Digishop Landing</title>
+
+  <!-- Tailwind CDN for quick prototyping -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-pv1f1s9eQ4VJr3uI1G0c1xgqD4Q0w0s1qf1z1k1Yf1Z2A1H1X1V1Y1Z1A1B1C1D" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    :root{
+      --vp-blue:#005AAB;
+      --vp-blue-2:#0066CC;
+      --accent-orange:#FF6A00;
+      --accent-red:#E6462F;
+      --accent-green:#28A745;
+    }
+    /* customize some tailwind classes */
+    .btn-primary{ @apply bg-[var(--vp-blue)] text-white font-semibold rounded-lg px-4 py-2 hover:brightness-105 transition; }
+    .btn-accent{ @apply bg-[var(--accent-orange)] text-white font-semibold rounded-lg px-4 py-2 hover:brightness-105 transition; }
+    .card-hover{ transition: transform .18s ease, box-shadow .18s ease; }
+    .card-hover:hover{ transform: translateY(-6px); box-shadow: 0 10px 30px rgba(2,6,23,0.12); }
+    /* Slider image object-fit */
+    .slide-img{ object-fit: cover; width:100%; height:100%; }
+    /* keep hero height reasonable */
+    @media (min-width: 1024px){
+      .hero-h{ height: 420px; }
+    }
+    @media (max-width: 1023px){
+      .hero-h{ height: 260px; }
+    }
+    /* small input icon spacing */
+    .input-icon{ padding-left: 2.5rem; }
+
+    /* Banner text animation & subtle overlay so image stays primary */
+    .slide-panel{ position: absolute; inset:0; display:flex; align-items:center; pointer-events:none; z-index:10; }
+    .overlay{ position:absolute; inset:0; z-index:8; pointer-events:none; }
+    .overlay.light{ background: linear-gradient(90deg, rgba(0,90,171,0.18) 0%, rgba(0,102,204,0.08) 60%, rgba(255,255,255,0.02) 100%); }
+    .overlay.green{ background: linear-gradient(90deg, rgba(40,167,69,0.14) 0%, rgba(255,255,255,0.02) 60%); }
+    .overlay.dark{ background: linear-gradient(90deg, rgba(0,90,171,0.18) 0%, rgba(0,0,0,0.18) 80%); }
+
+    .slide-content{ max-width:36rem; padding-left:1.5rem; padding-right:1.5rem; color:rgba(255,255,255,0.98); pointer-events:auto; z-index:12; }
+    .slide-content h2, .slide-content p, .slide-content .btn-accent, .slide-content a {
+      opacity:0;
+      transform: translateY(8px) scale(0.995);
+      transition: opacity 420ms cubic-bezier(.22,.9,.34,1), transform 420ms cubic-bezier(.22,.9,.34,1);
+    }
+    .slide-panel.animate .slide-content h2{ opacity:1; transform: translateY(0) scale(1); transition-delay:80ms; }
+    .slide-panel.animate .slide-content p{ opacity:1; transform: translateY(0) scale(1); transition-delay:160ms; }
+    .slide-panel.animate .slide-content .btn-accent{ opacity:1; transform: translateY(0) scale(1); transition-delay:240ms; }
+    .slide-panel.animate .slide-content a.bg-white{ opacity:1; transform: translateY(0) scale(1); transition-delay:300ms; }
+
+    /* lean text shadow for legibility on images */
+    .slide-content h2{ text-shadow: 0 6px 18px rgba(2,6,23,0.12); }
+  </style>
+</head>
+<body class="min-h-screen bg-white text-slate-800 antialiased">
+
+  <!-- Header: VNPT branch + agent + contact (functional, no right-side image) -->
+  <header class="sticky top-0 z-50 bg-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-3">
+        <img src="/download (5).webp" alt="VNPT" class="h-10 w-auto"/>
+        <div class="leading-tight">
+          <div class="text-sm font-semibold text-[var(--vp-blue)]">VNPT TÂY NINH</div>
+          <div class="text-xs text-slate-500">Nhân Viên Kinh doanh <span class="font-medium text-slate-700">Lê Thành Phát</span></div>
+        </div>
+      </a>
+
+      <!-- Nav (hidden on mobile) -->
+      <nav class="ml-6 hidden md:flex gap-6 items-center text-sm">
+        <a href="#" class="text-slate-700 hover:text-[var(--vp-blue)]">Trang chủ</a>
+        <a href="#simso" class="text-slate-700 hover:text-[var(--vp-blue)]">SIM số</a>
+        <a href="#goicuoc" class="text-slate-700 hover:text-[var(--vp-blue)]">Gói cước</a>
+        <a href="#km" class="text-slate-700 hover:text-[var(--vp-blue)]">Khuyến mãi</a>
+      </nav>
+
+      <!-- Search (responsive) -->
+      <div class="flex-1 md:flex-none ml-4">
+        <div class="relative max-w-md mx-auto md:mx-0">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input id="globalSearch" type="text" placeholder="Tìm số điện thoại, ví dụ: 0912..." class="input-icon block w-full md:w-[360px] border border-slate-200 rounded-lg px-3 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-[var(--vp-blue)]"/>
+        </div>
+      </div>
+
+      <!-- Contact (replaces previous header image) -->
+      <div class="ml-auto flex items-center gap-4">
+        <div class="hidden sm:flex flex-col items-end">
+          <span class="text-xs text-slate-500">Điện thoại liên hệ</span>
+          <a href="tel:0945836772" class="text-[var(--vp-blue)] font-bold text-sm hover:underline">0945 836 772</a>
+        </div>
+
+        <a id="callBtn" href="https://zalo.me/0945836772" target="_blank" rel="noopener" class="ml-2 bg-[var(--vp-blue)] text-white px-3 py-2 rounded-lg flex items-center gap-2 hover:brightness-95">
+          <i class="fa-solid fa-phone"></i>
+          <span class="text-sm">Gọi ngay</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Slider -->
+  <main class="max-w-6xl mx-auto px-4 pt-6 pb-12">
+    <section class="relative hero-h rounded-xl overflow-hidden shadow-sm">
+      <div id="slider" class="h-full w-full relative">
+        <!-- Slides -->
+        <div class="absolute inset-0 transition-opacity duration-700" data-slide="0">
+          <img src="/Screenshot 2026-04-20 153755.png" alt="Shopee x VinaPhone" class="slide-img"/>
+          <div class="overlay light"></div>
+          <div class="slide-panel">
+            <div class="slide-content max-w-3xl px-6 md:px-12">
+              <h2 class="text-xl md:text-3xl font-bold">Kết nối thả ga - Tặng Voucher Shopee</h2>
+              <p class="mt-3 text-sm md:text-base">Giảm đến 80.000Đ khi mua SIM/Gói cước trên Digishop hoặc app MyVNPT.</p>
+              <div class="mt-5 flex gap-3">
+                <a href="https://digishop.vnpt.vn/tin-tuc-km/tin-hot/ket-noi-tha-ga-tang-voucher-shopee" target="_blank" rel="noopener" class="bg-[#FF6A00] text-white rounded-lg px-4 py-2 font-semibold hover:brightness-105 transition">Mua SIM ngay để nhận mã</a>
+                <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="bg-white text-[var(--vp-blue)] rounded-lg px-4 py-2 font-semibold hover:brightness-95 transition">Xem SIM</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="absolute inset-0 transition-opacity duration-700 hidden" data-slide="1">
+          <img src="/Screenshot 2026-04-20 153720.png" alt="Grab x VinaPhone" class="slide-img"/>
+          <div class="overlay green"></div>
+          <div class="slide-panel">
+            <div class="slide-content max-w-3xl px-6 md:px-12">
+              <h2 class="text-xl md:text-3xl font-bold">Đi đâu cũng tiện - Nhận Voucher Grab</h2>
+              <p class="mt-3 text-sm md:text-base">Ưu đãi đến 150.000Đ (áp dụng tại sân bay). SIM/Gói mới chỉ từ 10k.</p>
+              <div class="mt-5 flex gap-3">
+                <a href="https://digishop.vnpt.vn/tin-tuc-km/tin-hot/xai-vina-grab-cho-ve-nha" target="_blank" rel="noopener" class="bg-[var(--accent-green)] text-white rounded-lg px-4 py-2 font-semibold hover:brightness-105 transition">Đăng ký gói cước ngay</a>
+                <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="bg-white text-[var(--vp-blue)] rounded-lg px-4 py-2 font-semibold">Mua SIM</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="absolute inset-0 transition-opacity duration-700 hidden" data-slide="2">
+          <img src="/Screenshot 2026-04-20 153737.png" alt="VinaPhone 5G" class="slide-img"/>
+          <div class="overlay dark"></div>
+          <div class="slide-panel">
+            <div class="slide-content max-w-3xl px-6 md:px-12">
+              <h2 class="text-xl md:text-3xl font-bold">Bứt phá tốc độ - Bao trọn Data</h2>
+              <p class="mt-3 text-sm md:text-base">Gói D159V: 180GB/tháng (6GB/ngày) + 1500 phút nội mạng. Chỉ 159k/tháng.</p>
+              <div class="mt-5 flex gap-3">
+                <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="btn-accent">Đăng ký ngay</a>
+                <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="bg-white text-[var(--vp-blue)] rounded-lg px-4 py-2 font-semibold">Chi tiết</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          <button class="w-3 h-3 rounded-full bg-white/60" data-dot="0"></button>
+          <button class="w-3 h-3 rounded-full bg-white/40" data-dot="1"></button>
+          <button class="w-3 h-3 rounded-full bg-white/40" data-dot="2"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 1: Ưu đãi Độc Quyền -->
+    <section id="km" class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="card-hover relative rounded-xl overflow-hidden p-6 flex items-center gap-4 border border-slate-100">
+        <div class="flex-shrink-0">
+          <img src="/download (7).webp" alt="Shopee" class="h-16 w-16 object-contain"/>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-slate-800">Tặng Voucher Shopee 80K</h3>
+          <p class="text-sm text-slate-600 mt-1">Mua SIM/Gói cước trên Digishop hoặc MyVNPT, nhận mã giảm trực tiếp.</p>
+          <div class="mt-4">
+            <a href="https://digishop.vnpt.vn/tin-tuc-km/tin-hot/ket-noi-tha-ga-tang-voucher-shopee" target="_blank" rel="noopener" class="bg-[#FF6A00] text-white rounded-lg px-4 py-2 font-semibold hover:brightness-105 transition">Mua SIM ngay để nhận mã</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-hover relative rounded-xl overflow-hidden p-6 flex items-center gap-4 border border-slate-100">
+        <div class="flex-shrink-0">
+          <img src="/grab-logo-transparent-free-png.webp" alt="Grab" class="h-16 w-16 object-contain"/>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-slate-800">Voucher Grab sân bay 150K</h3>
+          <p class="text-sm text-slate-600 mt-1">Ưu đãi dành cho người mua SIM/gói mới. Di chuyển tiện lợi đến sân bay.</p>
+          <div class="mt-4">
+            <a href="https://digishop.vnpt.vn/tin-tuc-km/tin-hot/xai-vina-grab-cho-ve-nha" target="_blank" rel="noopener" class="bg-[var(--accent-green)] text-white rounded-lg px-4 py-2 font-semibold hover:brightness-105 transition">Đăng ký gói cước ngay</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Gói Cước Nổi Bật -->
+    <section id="goicuoc" class="mt-10">
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-bold">Gói Cước Bứt Phá - Data Không Giới Hạn</h2>
+        <a href="#goicuoc" class="text-sm text-[var(--vp-blue)] hover:underline hidden md:inline">Xem tất cả gói cước →</a>
+      </div>
+
+      <div class="mt-6 space-y-4">
+        <!-- Gói: Soda 125 -->
+        <article class="card-hover border border-slate-100 rounded-xl p-5 flex flex-col md:flex-row gap-4 items-center bg-white">
+          <div class="flex-1">
+            <div class="flex items-center gap-4">
+              <div class="h-14 w-14 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-semibold text-slate-600">Gói</div>
+              <div>
+                <h3 class="text-lg md:text-xl font-bold">Gói Soda 125</h3>
+                <p class="text-sm text-slate-600">Dành cho người dùng muốn tiết kiệm nhưng vẫn nhiều data & ưu đãi</p>
+              </div>
+            </div>
+
+            <ul class="mt-4 grid grid-cols-2 gap-2 text-sm text-slate-700">
+              <li><span class="font-semibold">Data:</span> 50GB/tháng</li>
+              <li><span class="font-semibold">Nội mạng:</span> 200 phút</li>
+              <li><span class="font-semibold">Ngoại mạng:</span> 50 phút</li>
+              <li><span class="font-semibold">SMS:</span> 50 SMS</li>
+            </ul>
+          </div>
+
+          <div class="flex-shrink-0 text-center md:text-right">
+            <div class="text-2xl md:text-3xl font-bold text-[var(--vp-blue-2)]">125.000<span class="text-sm">đ</span><span class="text-sm text-slate-500">/tháng</span></div>
+            <div class="mt-4 flex justify-center md:justify-end gap-3">
+              <a href="https://digishop.vnpt.vn/di-dong/soda125/3923" target="_blank" rel="noopener" class="btn-accent inline-block text-center">Đăng ký ngay</a>
+              <a href="https://digishop.vnpt.vn/di-dong/soda125/3923" target="_blank" rel="noopener" class="bg-white border border-slate-200 text-[var(--vp-blue)] rounded-lg px-4 py-2 hover:brightness-95 inline-block">Chi tiết</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Gói: Soda 155 (thay thế D159V) -->
+        <article class="card-hover border border-slate-100 rounded-xl p-5 flex flex-col md:flex-row gap-4 items-center bg-white">
+          <div class="flex-1">
+            <div class="flex items-center gap-4">
+              <div class="h-14 w-14 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-semibold text-slate-600">Gói</div>
+              <div>
+                <h3 class="text-lg md:text-xl font-bold">Gói Soda 155</h3>
+                <p class="text-sm text-slate-600">Gói Soda 155 phù hợp người dùng cần nhiều data & gọi nội mạng ổn định</p>
+              </div>
+            </div>
+
+            <ul class="mt-4 grid grid-cols-2 gap-2 text-sm text-slate-700">
+              <li><span class="font-semibold">Data:</span> 150GB/tháng</li>
+              <li><span class="font-semibold">Nội mạng:</span> 1000 phút</li>
+              <li><span class="font-semibold">Ngoại mạng:</span> 200 phút</li>
+              <li><span class="font-semibold">SMS:</span> 200 SMS</li>
+            </ul>
+          </div>
+
+          <div class="flex-shrink-0 text-center md:text-right">
+            <div class="text-2xl md:text-3xl font-bold text-[var(--vp-blue-2)]">155.000<span class="text-sm">đ</span><span class="text-sm text-slate-500">/tháng</span></div>
+            <div class="mt-4 flex justify-center md:justify-end gap-3">
+              <a href="https://digishop.vnpt.vn/di-dong/soda155/4001" target="_blank" rel="noopener" class="btn-accent inline-block text-center">Đăng ký ngay</a>
+              <a href="https://digishop.vnpt.vn/di-dong/soda155/4001" target="_blank" rel="noopener" class="bg-white border border-slate-200 text-[var(--vp-blue)] rounded-lg px-4 py-2 hover:brightness-95 inline-block">Chi tiết</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Gói: Yolo100m (thay thế Soda 75) -->
+        <article class="card-hover border border-slate-100 rounded-xl p-5 flex flex-col md:flex-row gap-4 items-center bg-white">
+          <div class="flex-1">
+            <div class="flex items-center gap-4">
+              <div class="h-14 w-14 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-semibold text-slate-600">Gói</div>
+              <div>
+                <h3 class="text-lg md:text-xl font-bold">Gói Yolo100m</h3>
+                <p class="text-sm text-slate-600">Gói Yolo100m — ưu đãi cho người dùng cần mạng ổn định, nhiều data và gọi thoại hợp lý.</p>
+              </div>
+            </div>
+
+            <ul class="mt-4 grid grid-cols-2 gap-2 text-sm text-slate-700">
+              <li><span class="font-semibold">Data:</span> 30GB/tháng</li>
+              <li><span class="font-semibold">Nội mạng:</span> 100 phút</li>
+              <li><span class="font-semibold">Ngoại mạng:</span> 30 phút</li>
+              <li><span class="font-semibold">SMS:</span> 50 SMS</li>
+            </ul>
+          </div>
+
+          <div class="flex-shrink-0 text-center md:text-right">
+            <div class="text-2xl md:text-3xl font-bold text-[var(--vp-blue-2)]">100.000<span class="text-sm">đ</span><span class="text-sm text-slate-500">/tháng</span></div>
+            <div class="mt-4 flex justify-center md:justify-end gap-3">
+              <a href="https://digishop.vnpt.vn/di-dong/yolo100m/2469" target="_blank" rel="noopener" class="btn-accent inline-block text-center">Đăng ký ngay</a>
+              <a href="https://digishop.vnpt.vn/di-dong/yolo100m/2469" target="_blank" rel="noopener" class="bg-white border border-slate-200 text-[var(--vp-blue)] rounded-lg px-4 py-2 hover:brightness-95 inline-block">Chi tiết</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Gói: 5G70 (thay thế Unlimited) -->
+        <article class="card-hover border border-slate-100 rounded-xl p-5 flex flex-col md:flex-row gap-4 items-center bg-white">
+          <div class="flex-1">
+            <div class="flex items-center gap-4">
+              <div class="h-14 w-14 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-semibold text-slate-600">Gói</div>
+              <div>
+                <h3 class="text-lg md:text-xl font-bold">Gói 5G70</h3>
+                <p class="text-sm text-slate-600">Gói 5G70 — ưu đãi 5G tốc độ cao, phù hợp người dùng cần nhiều data và trải nghiệm 5G.</p>
+              </div>
+            </div>
+
+            <ul class="mt-4 grid grid-cols-2 gap-2 text-sm text-slate-700">
+              <li><span class="font-semibold">Data:</span> 70GB/tháng</li>
+              <li><span class="font-semibold">Nội mạng:</span> Không giới hạn</li>
+              <li><span class="font-semibold">Ngoại mạng:</span> Tùy gói</li>
+              <li><span class="font-semibold">SMS:</span> Tùy gói</li>
+            </ul>
+          </div>
+
+          <div class="flex-shrink-0 text-center md:text-right">
+            <div class="text-2xl md:text-3xl font-bold text-[var(--vp-blue-2)]">70.000<span class="text-sm">đ</span><span class="text-sm text-slate-500">/tháng</span></div>
+            <div class="mt-4 flex justify-center md:justify-end gap-3">
+              <a href="https://digishop.vnpt.vn/di-dong/5g70/4986" target="_blank" rel="noopener" class="btn-accent inline-block text-center">Đăng ký ngay</a>
+              <a href="https://digishop.vnpt.vn/di-dong/5g70/4986" target="_blank" rel="noopener" class="bg-white border border-slate-200 text-[var(--vp-blue)] rounded-lg px-4 py-2 hover:brightness-95 inline-block">Chi tiết</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Section 3: Tìm Kiếm Thần Sim Số -->
+    <section id="simso" class="mt-12 bg-slate-50 rounded-xl p-6">
+      <h2 class="text-xl font-bold">Tìm Kiếm "Thần Sim Số"</h2>
+      <p class="text-sm text-slate-600 mt-1">Nhập số hoặc chọn bộ lọc để tìm sim ưng ý.</p>
+
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Search + Filters -->
+        <div class="md:col-span-1 bg-white rounded-lg p-4 border border-slate-100">
+          <label class="block text-sm font-medium text-slate-700">Tìm số</label>
+          <div class="mt-2 relative">
+            <i class="fa-solid fa-phone absolute left-3 top-3 text-slate-400"></i>
+            <input id="simInput" placeholder="Nhập số bạn muốn tìm, vd: *999" class="pl-10 w-full border rounded-lg py-2 px-3 focus:ring-2 focus:ring-[var(--vp-blue)]" />
+          </div>
+
+          <label class="block text-sm font-medium text-slate-700 mt-4">Đầu số</label>
+          <select id="prefixFilter" class="mt-2 w-full border rounded-lg px-3 py-2">
+            <option value="">Tất cả</option>
+            <option>088</option>
+            <option>091</option>
+            <option>094</option>
+            <option>089</option>
+          </select>
+
+          <label class="block text-sm font-medium text-slate-700 mt-4">Loại SIM</label>
+          <select id="typeFilter" class="mt-2 w-full border rounded-lg px-3 py-2">
+            <option value="">Tất cả</option>
+            <option>Tam hoa</option>
+            <option>Tứ quý</option>
+            <option>Thần tài</option>
+            <option>Lộc phát</option>
+          </select>
+
+          <button id="searchSimBtn" class="btn-primary mt-4 w-full" aria-label="Tìm Sim">
+            <i class="fa-solid fa-magnifying-glass mr-2"></i>
+            Tìm Sim
+          </button>
+        </div>
+
+        <!-- Results -->
+        <div class="md:col-span-2 space-y-3">
+          <div id="simResults" class="grid grid-cols-1 gap-3">
+            <!-- Example result cards (will be replaced by JS) -->
+            <div class="flex items-center justify-between bg-white border border-slate-100 rounded-lg p-4">
+              <div>
+                <div class="text-lg font-semibold">0912.999.999</div>
+                <div class="text-sm text-slate-500 mt-1">Thần tài - Đầu 091</div>
+              </div>
+              <div class="text-right">
+                <div class="text-xl font-bold text-[var(--vp-blue-2)]">3.500.000đ</div>
+                <div class="mt-2 flex gap-2 justify-end">
+                  <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="bg-white border border-slate-200 text-[var(--vp-blue)] rounded-lg px-3 py-1 text-sm inline-block">Chi tiết</a>
+                  <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="btn-accent px-3 py-1 text-sm inline-block">Mua ngay</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between bg-white border border-slate-100 rounded-lg p-4">
+              <div>
+                <div class="text-lg font-semibold">0888.123.888</div>
+                <div class="text-sm text-slate-500 mt-1">Lộc phát - Đầu 088</div>
+              </div>
+              <div class="text-right">
+                <div class="text-xl font-bold text-[var(--vp-blue-2)]">2.200.000đ</div>
+                <div class="mt-2 flex gap-2 justify-end">
+                  <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="bg-white border border-slate-200 text-[var(--vp-blue)] rounded-lg px-3 py-1 text-sm inline-block">Chi tiết</a>
+                  <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="btn-accent px-3 py-1 text-sm inline-block">Mua ngay</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between bg-white border border-slate-100 rounded-lg p-4">
+              <div>
+                <div class="text-lg font-semibold">0944.777.444</div>
+                <div class="text-sm text-slate-500 mt-1">Tứ quý - Đầu 094</div>
+              </div>
+              <div class="text-right">
+                <div class="text-xl font-bold text-[var(--vp-blue-2)]">8.500.000đ</div>
+                <div class="mt-2 flex gap-2 justify-end">
+                  <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="bg-white border border-slate-200 text-[var(--vp-blue)] rounded-lg px-3 py-1 text-sm inline-block">Chi tiết</a>
+                  <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="btn-accent px-3 py-1 text-sm inline-block">Mua ngay</a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-12 border-t border-slate-100 pt-6 pb-10">
+      <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-start gap-6">
+        <div>
+          <div class="flex items-center gap-3">
+            <img src="/download (5).webp" alt="VNPT" class="h-10 w-auto"/>
+            <span class="text-lg font-semibold text-[var(--vp-blue)]">VNPT VinaPhone</span>
+          </div>
+          <p class="mt-3 text-sm text-slate-600">© 2026 Tổng công ty Dịch vụ Viễn thông (VNPT VinaPhone). Bản quyền thuộc VNPT.</p>
+        </div>
+
+        <div class="flex gap-6">
+          <div>
+            <div class="font-semibold">Hotline CSKH</div>
+            <div class="text-[var(--vp-blue)] font-bold text-lg mt-1">1800 1091</div>
+          </div>
+
+          <div class="text-sm">
+            <a href="#" class="block text-slate-600 hover:underline">Chính sách bảo mật</a>
+            <a href="#" class="block text-slate-600 hover:underline mt-1">Điều khoản sử dụng</a>
+            <div class="flex gap-3 mt-3">
+              <a href="#" class="text-slate-600 hover:text-[var(--vp-blue)]"><i class="fa-brands fa-facebook fa-lg"></i></a>
+              <a href="#" class="text-slate-600 hover:text-[var(--vp-blue)]"><i class="fa-brands fa-instagram fa-lg"></i></a>
+              <a href="#" class="text-slate-600 hover:text-[var(--vp-blue)]"><i class="fa-brands fa-youtube fa-lg"></i></a>
+            </div>
+            <div class="mt-3">
+              <a href="#" class="inline-block">
+                <img src="/download (6).webp" alt="My VNPT" class="h-9"/>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Scripts -->
+  <script>
+    // Simple slider with text animations
+    (function(){
+      const slides = Array.from(document.querySelectorAll('#slider [data-slide]'));
+      const dots = Array.from(document.querySelectorAll('#slider [data-dot]'));
+      let idx = 0, timer = null;
+      function clearAnimate(s){
+        const panel = s.querySelector('.slide-panel');
+        if(panel) panel.classList.remove('animate');
+      }
+      function setAnimate(s){
+        const panel = s.querySelector('.slide-panel');
+        if(panel){
+          // small timeout to allow reflow when showing
+          requestAnimationFrame(()=> setTimeout(()=> panel.classList.add('animate'), 40));
+        }
+      }
+      function show(n){
+        slides.forEach((s,i)=>{
+          if(i===n){
+            s.classList.remove('hidden');
+            s.style.opacity='1';
+            setAnimate(s);
+          } else {
+            clearAnimate(s);
+            s.classList.add('hidden');
+            s.style.opacity='0';
+          }
+        });
+        dots.forEach((d,i)=> d.style.opacity = i===n ? '1' : '0.6');
+        idx = n;
+      }
+      function next(){
+        show((idx+1)%slides.length);
+      }
+      dots.forEach(d=>{
+        d.addEventListener('click', ()=> { show(Number(d.dataset.dot)); reset(); });
+      });
+      function reset(){ clearInterval(timer); timer = setInterval(next, 5000); }
+      show(0);
+      reset();
+    })();
+
+    // Sim search/filter (simulate results)
+    (function(){
+      const sims = [
+        {num:'0912999999', type:'Thần tài', prefix:'091', price:3500000},
+        {num:'0888123888', type:'Lộc phát', prefix:'088', price:2200000},
+        {num:'0944777444', type:'Tứ quý', prefix:'094', price:8500000},
+        {num:'0899000999', type:'Tam hoa', prefix:'089', price:1200000},
+      ];
+      const resultsEl = document.getElementById('simResults');
+      const simInput = document.getElementById('simInput');
+      const prefixFilter = document.getElementById('prefixFilter');
+      const typeFilter = document.getElementById('typeFilter');
+      const searchBtn = document.getElementById('searchSimBtn');
+
+      function fmt(v){ return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+
+      function render(list){
+        resultsEl.innerHTML = '';
+        if(!list.length){
+          resultsEl.innerHTML = '<div class="bg-white border border-slate-100 rounded-lg p-4 text-center text-slate-500">Không tìm thấy kết quả</div>';
+          return;
+        }
+        list.forEach(s=>{
+          const div = document.createElement('div');
+          div.className = 'flex items-center justify-between bg-white border border-slate-100 rounded-lg p-4';
+          div.innerHTML = `
+            <div>
+              <div class="text-lg font-semibold">${s.num}</div>
+              <div class="text-sm text-slate-500 mt-1">${s.type} - Đầu ${s.prefix}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-xl font-bold text-[var(--vp-blue-2)]">${fmt(s.price)}đ</div>
+              <div class="mt-2 flex gap-2 justify-end">
+                <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="bg-white border border-slate-200 text-[var(--vp-blue)] rounded-lg px-3 py-1 text-sm inline-block">Chi tiết</a>
+                <a href="https://digishop.vnpt.vn/" target="_blank" rel="noopener" class="btn-accent px-3 py-1 text-sm inline-block">Mua ngay</a>
+              </div>
+            </div>
+          `;
+          resultsEl.appendChild(div);
+        });
+      }
+
+      function filter(){
+        const q = (simInput.value||'').replace(/\D/g,'');
+        const pref = prefixFilter.value;
+        const type = typeFilter.value;
+        let res = sims.slice();
+        if(q) res = res.filter(s=> s.num.includes(q));
+        if(pref) res = res.filter(s=> s.prefix === pref);
+        if(type) res = res.filter(s=> s.type === type);
+        render(res);
+      }
+
+      // Redirect to Digishop SIM search page with optional query params (and always set tab=c320)
+      function goToDigishop(){
+        const q = (simInput.value||'').replace(/\D/g,'').trim();
+        const pref = (prefixFilter.value||'').trim();
+        const type = (typeFilter.value||'').trim();
+        const params = new URLSearchParams();
+        if(q) params.set('q', q);
+        if(pref) params.set('prefix', pref);
+        if(type) params.set('type', type);
+        params.set('tab', 'c320');
+        const url = 'https://digishop.vnpt.vn/sim-so?' + params.toString();
+        // navigate to external site
+        window.location.href = url;
+      }
+
+      searchBtn.addEventListener('click', goToDigishop);
+      // also trigger redirect on Enter
+      simInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') goToDigishop(); });
+      // initial render
+      render(sims);
+    })();
+  </script>
+</body>
+</html>
